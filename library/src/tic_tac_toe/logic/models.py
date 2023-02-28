@@ -4,6 +4,16 @@ import re
 from dataclasses import dataclass
 from functools import cached_property
 
+WINNING_PATTERNS = (
+    "???......", # row 1
+    "...???...", # row 2
+    "......???", # row 3
+    "?..?..?..", # col 1
+    ".?..?..?.", # col 2
+    "..?..?..?", # col 3
+    "?...?...?", # diag 135 degree
+    "..?.?.?..", # diag 45 degree
+)
 
 class Mark(str, enum.Enum):
     CROSS = "X"
@@ -33,6 +43,45 @@ class Grid:
     
     def print_grid(self) -> None:
         print(self.cells[:3], self.cells[3:6], self.cells[6:], sep='\n')
+
+@dataclass(frozen=True)
+class Move:
+    player_mark : Mark
+    cell_index : int
+    before_state : GameState
+    after_state : GameState
+
+@dataclass(frozen=True)
+class GameState:
+    grid : Grid
+    starting_player_mark : Mark = Mark("X")
+    
+    @cached_property
+    def current_player_mark(self) -> Mark:
+        if self.grid.x_count == self.grid.o_count:
+            return self.starting_player_mark
+        else:
+            return self.starting_player_mark.other
+    @cached_property
+    def game_not_started(self) -> bool:
+        return self.grid.empty_count == 9
+    
+    @cached_property
+    def game_over(self) -> bool:
+        return self.winner is not None or self.tie
+    
+    @cached_property
+    def tie(self) -> bool:
+        return self.winner is None and self.grid.empty_count == 0
+    
+    @cached_property
+    def winner(self) -> Mark | None:
+        for pattern in WINNING_PATTERNS:
+            for mark in Mark:
+                if re.match(pattern.replace("?", mark), self.grid.cells):
+                    return mark
+        return None
+    
 
 grid = Grid("XXOOXXOOX")  
 grid.print_grid()
