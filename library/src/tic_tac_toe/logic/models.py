@@ -71,6 +71,10 @@ class GameState:
         return self.winner is not None or self.tie
     
     @cached_property
+    def game_ongoing(self) -> bool:
+        return not self.game_over and not self.game_not_started
+    
+    @cached_property
     def tie(self) -> bool:
         return self.winner is None and self.grid.empty_count == 0
     
@@ -82,6 +86,19 @@ class GameState:
                     return mark
         return None
     
+    @cached_property
+    def winning_cells(self) -> list[int]:
+        for pattern in WINNING_PATTERNS:
+            for mark in Mark:
+                if re.match(pattern.replace("?", mark), self.grid.cells):
+                    return [
+                        match.start()
+                        for match in re.finditer(r"\?", pattern)
+                    ]
+        return []
+    
 
-grid = Grid("XXOOXXOOX")  
-grid.print_grid()
+griddy = Grid("XXXOOOOOX")  
+gs = GameState(grid=griddy)
+print(f'{gs.game_over},{gs.game_not_started},{gs.game_ongoing}, {gs.tie}, {gs.winner}', gs.winning_cells)
+gs.grid.print_grid()
