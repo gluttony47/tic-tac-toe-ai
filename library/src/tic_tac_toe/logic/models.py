@@ -30,5 +30,9 @@ class Grid:
     @cached_property
     def empty_count(self) -> int:
         return self.cells.count(" ")
+    
+    def print_grid(self) -> None:
+        print(self.cells[:3], self.cells[3:6], self.cells[6:], sep='\n')
 
 grid = Grid("XXOOXXOOX")  
+grid.print_grid()

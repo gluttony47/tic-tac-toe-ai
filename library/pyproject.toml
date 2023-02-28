@@ -5,5 +5,5 @@ requires = ["setuptools>=64.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tic-tac-toe"
+name = "tic_tac_toe_ai"
 version = "0.1.280223"
